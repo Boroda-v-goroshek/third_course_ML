@@ -80,7 +80,7 @@ def convert_to_readable(predicts: list[dict], texts: list[str]) -> list[dict]:
         readable_results.append({
             'text': text,
             'label': star_to_sentiment[label],
-            'confidence': score
+            'confidence': round(score, 4)
         })
     
     return readable_results
@@ -113,8 +113,8 @@ def sentiment_classification(opts: Config):
         readable_predicts = convert_to_readable(predicts, lines)
 
         print("\nРезультаты классификации:")
-        print(f"Формат вывода: <phrase> : <predict> : <label>")
         print("-" * 50)
+        print(f"<phrase> : <predict> : <label>")
 
         # считаем правильные ответы (accuracy)
         good_preds_count = count_metrics(opts.labels_path, readable_predicts)
