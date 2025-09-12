@@ -1,0 +1,8 @@
+[project]
+name = "third_course_ML"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "transformers==4.56.1",
+    "torch==2.8.0"
+]

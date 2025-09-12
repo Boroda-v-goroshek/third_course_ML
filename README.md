@@ -11,9 +11,18 @@ root: вы находитесь тут
 
 ***Использование***
 
+из вашей директории:
+
+```
+wget -q -O - https://astral.sh/uv/install.sh | sh
+uv venv или uv venv venv
+source .venv/bin/activate
+```
+
 из root:
 
 ```
+uv pip install -e .
 bash scripts/<task>.sh - общий вид
 bash scripts/GenAI-1-06.sh - задача первого блока
 ```

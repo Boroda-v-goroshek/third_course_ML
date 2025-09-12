@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: third_course_ML
+Version: 0.1.0
+Requires-Python: >=3.12
+Requires-Dist: transformers==4.56.1
+Requires-Dist: torch==2.8.0
