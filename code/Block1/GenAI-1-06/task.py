@@ -61,8 +61,6 @@ def count_metrics(labels_path: str | Path, data: list[dict]) -> int:
             raise ValueError("Неправильный формат меток!")
 
         for i, label in enumerate(lines):
-            label = Labels(label)
-            
             dict_i = data[i]
             text = dict_i['text']
             predict = dict_i['label']
@@ -91,11 +89,11 @@ def convert_to_readable(predicts: list[dict], texts: list[str]) -> list[dict]:
         New list of dicts in readable format: predicts[i] = {'text': <phrase>, 'label': <sentiment>, 'score': x}
     """
     star_to_sentiment = {
-        '1 star': Labels.NEGATIVE,
-        '2 stars': Labels.NEGATIVE,
-        '3 stars': Labels.NEUTRAL, 
-        '4 stars': Labels.POSITIVE,
-        '5 stars': Labels.POSITIVE
+        '1 star': Labels.NEGATIVE.value,
+        '2 stars': Labels.NEGATIVE.value,
+        '3 stars': Labels.NEUTRAL.value, 
+        '4 stars': Labels.POSITIVE.value,
+        '5 stars': Labels.POSITIVE.value
     }
     
     readable_results = []
