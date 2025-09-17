@@ -1,2 +1,2 @@
-data_path: "data/Block1/GenAI-1-06_data.txt"
-labels_path: "data/Block1/GenAI-1-06_labels.txt"
+data_path: "data/GenAI-1-06_data.txt"
+labels_path: "data/GenAI-1-06_labels.txt"

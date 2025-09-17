@@ -73,8 +73,12 @@ def load_config(cfg_path: str | Path) -> Config:
         Full config as class with console arguments
 
     """
-    with open(cfg_path) as ymfile:
-        cfg = yaml.load(ymfile, Loader=yaml.FullLoader)
+    try:
+        with open(cfg_path) as ymfile:
+            cfg = yaml.load(ymfile, Loader=yaml.FullLoader)
+    except:
+        raise Exception(f"Файл {cfg_path} не найден!")
+
 
     cfg = Config(cfg)
 

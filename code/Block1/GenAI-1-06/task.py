@@ -1,6 +1,7 @@
 # imports and constants
 from pathlib import Path
 from enum import Enum
+import os.path
 
 import torch
 from transformers import pipeline
@@ -14,6 +15,25 @@ class Labels(Enum):
     NEGATIVE = "negative"
     NEUTRAL = "neutral"
 
+
+def check_labels(labels: list[str]) -> bool:
+    '''Check that labels-file is valid.
+    
+    Parameters
+    ----------
+    labels: list[str]
+        List of labels in file
+    
+    Returns
+    -------
+    bool
+        Valid or not valid    
+    '''
+    for label in labels:
+        label = Labels(label)
+        if ((label != Labels.POSITIVE) and (label != Labels.NEGATIVE) and (label != Labels.NEUTRAL)):
+            return False
+    return True
 
 def count_metrics(labels_path: str | Path, data: list[dict]) -> int:
     '''Calculate some metric(now only accuracy).
@@ -35,9 +55,14 @@ def count_metrics(labels_path: str | Path, data: list[dict]) -> int:
 
     # в цикле бежим по файлу с метками для фраз и сравниваем метки с предсказаниями
     with open(labels_path, "r", encoding='utf-8') as file:
-        lines = [line.strip() for line in file.readlines() if line.strip()]
+        lines = [line.strip().lower() for line in file.readlines() if line.strip()]
+
+        if not check_labels(lines):
+            raise ValueError("Неправильный формат меток!")
 
         for i, label in enumerate(lines):
+            label = Labels(label)
+            
             dict_i = data[i]
             text = dict_i['text']
             predict = dict_i['label']
@@ -66,11 +91,11 @@ def convert_to_readable(predicts: list[dict], texts: list[str]) -> list[dict]:
         New list of dicts in readable format: predicts[i] = {'text': <phrase>, 'label': <sentiment>, 'score': x}
     """
     star_to_sentiment = {
-        '1 star': Labels.NEGATIVE.value,
-        '2 stars': Labels.NEGATIVE.value,
-        '3 stars': Labels.NEUTRAL.value, 
-        '4 stars': Labels.POSITIVE.value,
-        '5 stars': Labels.POSITIVE.value
+        '1 star': Labels.NEGATIVE,
+        '2 stars': Labels.NEGATIVE,
+        '3 stars': Labels.NEUTRAL, 
+        '4 stars': Labels.POSITIVE,
+        '5 stars': Labels.POSITIVE
     }
     
     readable_results = []
@@ -94,6 +119,13 @@ def sentiment_classification(opts: Config):
     opts: Config
         Configuration for this task
     '''
+
+    if not os.path.exists(opts.data_path):
+        raise Exception(f"Файл {opts.data_path} не найден!")
+    
+    if not os.path.exists(opts.labels_path):
+        raise Exception(f"Файл {opts.labels_path} не найден!")
+
     # создаем классификатор
     classifier = pipeline('sentiment-analysis', model='nlptown/bert-base-multilingual-uncased-sentiment')
 
@@ -101,9 +133,11 @@ def sentiment_classification(opts: Config):
 
     # в цикле бежим по файлу с фразами и передаем их в классификатор
     with open(opts.data_path, "r", encoding='utf-8') as file:
+        # тут уже включена обработка неправильного формата данных (пробелы, разделители и т.д.)
         lines = [line.strip() for line in file.readlines() if line.strip()]
 
         # predicts[i] представляет собой [{'label': n star, 'score': x}]
+        # если фразы НЕ ВАЛИДНЫ, то предиктор их тоже обработает (пусть и, вероятно, не правильно)
         predicts = classifier(lines)
         
         # избавляемся от внутренних списков
