@@ -15,6 +15,8 @@ root: вы находитесь тут
 
 ```
 wget -q -O - https://astral.sh/uv/install.sh | sh
+или
+sudo snap install astral-uv
 uv venv или uv venv venv
 source .venv/bin/activate
 ```
