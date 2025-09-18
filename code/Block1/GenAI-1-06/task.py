@@ -125,7 +125,10 @@ def sentiment_classification(opts: Config):
         raise Exception(f"Файл {opts.labels_path} не найден!")
 
     # создаем классификатор
-    classifier = pipeline('sentiment-analysis', model='nlptown/bert-base-multilingual-uncased-sentiment')
+    try:
+        classifier = pipeline('sentiment-analysis', model='nlptown/bert-base-multilingual-uncased-sentiment')
+    except:
+        raise Exception("Failed in downloadint classifier")
 
     print("Начинаем обработку фраз!")
 
