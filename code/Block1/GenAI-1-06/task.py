@@ -128,7 +128,7 @@ def sentiment_classification(opts: Config):
     try:
         classifier = pipeline('sentiment-analysis', model='nlptown/bert-base-multilingual-uncased-sentiment')
     except:
-        raise Exception("Failed in downloadint classifier")
+        raise Exception("Failed in download classifier")
 
     print("Начинаем обработку фраз!")
 
