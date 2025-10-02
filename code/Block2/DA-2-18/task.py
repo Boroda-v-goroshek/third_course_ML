@@ -33,11 +33,11 @@ def generate_synthetic_data(opts: Config) -> pd.DataFrame:
         # Исскусственно задаем зависимости между переменными
         var2 = []
         for cat in var1:
-            if cat == "A":
+            if cat == var1_cats[0]:
                 probs = [0.4, 0.4, 0.2]
-            elif cat == "B":
+            elif cat == var1_cats[1]:
                 probs = [0.4, 0.4, 0.2]
-            else:  # C
+            elif cat == var1_cats[2]:
                 probs = [0.5, 0.2, 0.3]
             var2.append(np.random.choice(var2_cats, p=probs))
     except Exception as e:
