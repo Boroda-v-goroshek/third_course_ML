@@ -21,24 +21,27 @@ def generate_synthetic_data(opts: Config) -> pd.DataFrame:
     """
 
     # Синтетику мы генерируем сами
-    np.random.seed(opts.data.random_seed)
-    
-    n_samples = opts.data.sample_size
-    var1_cats = opts.variables.var1_categories
-    var2_cats = opts.variables.var2_categories
-    
-    var1 = np.random.choice(var1_cats, size=n_samples, p=[0.4, 0.35, 0.25])
+    try:
+        np.random.seed(opts.data.random_seed)
+        
+        n_samples = opts.data.sample_size
+        var1_cats = opts.variables.var1_categories
+        var2_cats = opts.variables.var2_categories
+        
+        var1 = np.random.choice(var1_cats, size=n_samples, p=[0.4, 0.35, 0.25])
 
-    # Исскусственно задаем зависимости между переменными
-    var2 = []
-    for cat in var1:
-        if cat == "A":
-            probs = [0.4, 0.4, 0.2]
-        elif cat == "B":
-            probs = [0.4, 0.4, 0.2]
-        else:  # C
-            probs = [0.5, 0.2, 0.3]
-        var2.append(np.random.choice(var2_cats, p=probs))
+        # Исскусственно задаем зависимости между переменными
+        var2 = []
+        for cat in var1:
+            if cat == "A":
+                probs = [0.4, 0.4, 0.2]
+            elif cat == "B":
+                probs = [0.4, 0.4, 0.2]
+            else:  # C
+                probs = [0.5, 0.2, 0.3]
+            var2.append(np.random.choice(var2_cats, p=probs))
+    except Exception as e:
+        print(f"Ошибка при генерации синтетики: {e}")
     
     return pd.DataFrame({
         'Category1': var1,
@@ -46,7 +49,7 @@ def generate_synthetic_data(opts: Config) -> pd.DataFrame:
     })
 
 
-def perform_chi2_analysis(df: pd.DataFrame, opts: Config) -> dict:
+def perform_chi2_analysis(df: pd.DataFrame, opts: Config) -> dict | None:
     """Perform chi-square test of independence for two categorical variables.
     
     Parameters
@@ -58,33 +61,37 @@ def perform_chi2_analysis(df: pd.DataFrame, opts: Config) -> dict:
     
     Returns
     -------
-    dict
+    dict | None
         Dictionary containing test results and statistics
     """
-    contingency_table = pd.crosstab(df['Category1'], df['Category2'])
-    
-    print("Таблица сопряженности (Contingency Table):")
-    print(contingency_table)
-    print("\n" + "="*50 + "\n")
-    
-    chi2, p_value, dof, expected = chi2_contingency(contingency_table)
-    
-    # Тут идет интерпретация результатов
-    alpha = 0.05
-    if p_value < alpha:
-        interpretation = "ЕСТЬ статистически значимая зависимость"
-    else:
-        interpretation = "НЕТ статистически значимой зависимости"
-    
-    results = {
-        'chi2_statistic': chi2,
-        'p_value': p_value,
-        'degrees_of_freedom': dof,
-        'contingency_table': contingency_table,
-        'expected_frequencies': expected,
-        'interpretation': interpretation,
-        'significance_level': alpha
-    }
+
+    try:
+        contingency_table = pd.crosstab(df['Category1'], df['Category2'])
+        chi2, p_value, dof, expected = chi2_contingency(contingency_table)
+        
+        print("Таблица сопряженности (Contingency Table):")
+        print(contingency_table)
+        print("\n" + "="*50 + "\n")
+        
+        # Тут идет интерпретация результатов
+        alpha = 0.05
+        if p_value < alpha:
+            interpretation = "ЕСТЬ статистически значимая зависимость"
+        else:
+            interpretation = "НЕТ статистически значимой зависимости"
+        
+        results = {
+            'chi2_statistic': chi2,
+            'p_value': p_value,
+            'degrees_of_freedom': dof,
+            'contingency_table': contingency_table,
+            'expected_frequencies': expected,
+            'interpretation': interpretation,
+            'significance_level': alpha
+        }
+    except Exception as e:
+        print(f"Ошибка при подсчете хи-квадрат: {e}")
+        return None
     
     return results
 
@@ -160,8 +167,9 @@ def analyze_categorical_dependence(opts: Config):
     
     results = perform_chi2_analysis(df, opts)
     
-    print_results(results)
-    save_results(results, opts)
+    if results is not None:
+        print_results(results)
+        save_results(results, opts)
 
 
 def main():
