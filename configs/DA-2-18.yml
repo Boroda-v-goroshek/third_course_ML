@@ -1,0 +1,10 @@
+data:
+  sample_size: 1000
+  random_seed: 42
+  
+variables:
+  var1_categories: ["A", "B", "C"]
+  var2_categories: ["X", "Y", "Z"]
+  
+output: 
+  results_path: "data/DA-2-18_results.txt"
