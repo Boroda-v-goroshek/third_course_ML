@@ -28,26 +28,35 @@ def generate_synthetic_data(opts: Config) -> pd.DataFrame:
         var1_cats = opts.variables.var1_categories
         var2_cats = opts.variables.var2_categories
         
-        var1 = np.random.choice(var1_cats, size=n_samples, p=[0.4, 0.35, 0.25])
+        # Вероятности для первой переменной
+        var1_probs = np.random.dirichlet(np.ones(len(var1_cats)))
+        var1_probs = list(var1_probs / var1_probs.sum())
+        
+        var1 = np.random.choice(var1_cats, size=n_samples, p=var1_probs)
 
-        # Исскусственно задаем зависимости между переменными
+        # Динамическое создание зависимостей на основе индексов
         var2 = []
         for cat in var1:
-            if cat == var1_cats[0]:
-                probs = [0.4, 0.4, 0.2]
-            elif cat == var1_cats[1]:
-                probs = [0.4, 0.4, 0.2]
-            elif cat == var1_cats[2]:
-                probs = [0.5, 0.2, 0.3]
+            cat_index = var1_cats.index(cat)
+            
+            # Создаем вероятности, которые зависят от индекса категории
+            # Это создает "диагональную" зависимость
+            base_probs = np.ones(len(var2_cats))
+            # Увеличиваем вероятность для категории с тем же индексом
+            if cat_index < len(var2_cats):
+                base_probs[cat_index] += 0.2
+
+            probs = base_probs / base_probs.sum()
             var2.append(np.random.choice(var2_cats, p=probs))
+            
+        return pd.DataFrame({
+            'Category1': var1,
+            'Category2': var2
+        })
+        
     except Exception as e:
         print(f"Ошибка при генерации синтетики: {e}")
-    
-    return pd.DataFrame({
-        'Category1': var1,
-        'Category2': var2
-    })
-
+        raise
 
 def perform_chi2_analysis(df: pd.DataFrame, opts: Config) -> dict | None:
     """Perform chi-square test of independence for two categorical variables.
