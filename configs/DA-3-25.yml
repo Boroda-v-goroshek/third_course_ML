@@ -1,0 +1,12 @@
+data:
+  sample_size: 500
+  random_seed: 42
+  trend_type: "sinusoidal"  # sinusoidal, linear, random
+  
+window:
+  size: 50
+  min_periods: 1
+  
+output:
+  results_path: "results/DA-3-25/rolling_range_analysis.png"
+  data_path: "results/DA-3-25/rolling_data.csv"

@@ -28,4 +28,5 @@ uv pip install -e .
 bash scripts/<task>.sh - общий вид
 bash scripts/GenAI-1-06.sh - задача первого блока
 bash scripts/DA-2-18.sh - задача второго блока
+bash scripts/DA-3-25.sh - задача третьего блока
 ```
